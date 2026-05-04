@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-const KELOMPOK = ['Batusari', 'Guji Baru', 'Kemanggisan Pulo', 'Kemanggisan Ilir'];
-const ROLES = ['Guru', 'Admin', 'Superadmin'];
+const KELOMPOK = ['Pilih Kelompok','Batusari', 'Guji Baru', 'Kemanggisan Pulo', 'Kemanggisan Ilir'];
+const ROLES = ['Pilih Role','Guru', 'Admin', 'Superadmin'];
 
 export default function Users() {
   const [list, setList] = useState([]);
