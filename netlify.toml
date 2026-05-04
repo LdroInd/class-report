@@ -1,0 +1,24 @@
+[build]
+  command = "npm install && chmod +x node_modules/.bin/vite && vite build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[dev]
+  framework = "#custom"
+  command = "npx vite"
+  targetPort = 3002
+  port = 8888
+
+[functions]
+  node_bundler = "esbuild"
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
