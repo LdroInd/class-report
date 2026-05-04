@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-const KELOMPOK = ['Batusari', 'Guji Baru', 'Kemanggisan Pulo', 'Kemanggisan Ilir'];
+const KELOMPOK = ['--Belum Pilih Kelompok--','Batusari', 'Guji Baru', 'Kemanggisan Pulo', 'Kemanggisan Ilir'];
 
 export default function Generus() {
   const [list, setList] = useState([]);
