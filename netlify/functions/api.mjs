@@ -196,16 +196,19 @@ export const handler = async (event) => {
 
     // ===== REPORT =====
     if (path === '/report' && method === 'GET') {
-      const { from, to, grade, generus_id } = qs;
+      const { from, to, grade, generus_id, kelompok } = qs;
       if (!from || !to) return json(400, { error: 'Tanggal from dan to wajib diisi' });
       let query = `SELECT kh.id as kelas_id, TO_CHAR(kh.tanggal_kelas,'YYYY-MM-DD') as tanggal, kh.jam_mulai, kh.guru_nama, kh.nama_kbm, kh.grade,
-        kd.id as detail_id, kd.nama_generus, COALESCE(kd.keterangan,'') as keterangan
+        kd.id as detail_id, kd.nama_generus, COALESCE(kd.keterangan,'') as keterangan,
+        COALESCE(rg.kelompok,'') as kelompok
         FROM rg_kelas_header kh JOIN rg_kelas_detail kd ON kd.kelas_id = kh.id
+        LEFT JOIN rg_generus rg ON rg.id = kd.generus_id
         WHERE kh.tanggal_kelas >= $1 AND kh.tanggal_kelas <= $2`;
       const args = [from, to];
       let idx = 3;
       if (grade) { query += ` AND kh.grade = $${idx}`; args.push(grade); idx++; }
       if (generus_id) { query += ` AND kd.generus_id = $${idx}`; args.push(generus_id); idx++; }
+      if (kelompok) { query += ` AND rg.kelompok = $${idx}`; args.push(kelompok); idx++; }
       query += ` ORDER BY kh.tanggal_kelas, kh.jam_mulai, kd.nama_generus`;
       const r = await pool.query(query, args);
       return json(200, r.rows);

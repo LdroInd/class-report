@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 const GRADES = ['', 'Paud', 'Caberawit 1', 'Caberawit 2', 'Generus Pra-Remaja', 'Generus Remaja', 'Usia Mandiri'];
+const KELOMPOK = ['', 'Batusari', 'Guji Baru', 'Kemanggisan Pulo', 'Kemanggisan Ilir'];
 
 export default function Report() {
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
   const [grade, setGrade] = useState('');
+  const [kelompok, setKelompok] = useState('');
   const [generusId, setGenerusId] = useState('');
   const [generusList, setGenerusList] = useState([]);
   const [data, setData] = useState([]);
@@ -25,6 +27,7 @@ export default function Report() {
     let url = `/api/report?from=${from}&to=${to}`;
     if (grade) url += `&grade=${encodeURIComponent(grade)}`;
     if (generusId) url += `&generus_id=${generusId}`;
+    if (kelompok) url += `&kelompok=${encodeURIComponent(kelompok)}`;
     const res = await fetch(url);
     setData((await res.json()) || []);
     setLoaded(true);
@@ -32,7 +35,7 @@ export default function Report() {
 
   function handlePrint() {
     const rows = data.map(r =>
-      `<tr><td>${r.tanggal}</td><td>${r.jam_mulai}</td><td>${r.guru_nama}</td><td>${r.nama_kbm}</td><td>${r.grade}</td><td>${r.nama_generus}</td><td>${r.keterangan}</td></tr>`
+      `<tr><td>${r.tanggal}</td><td>${r.jam_mulai}</td><td>${r.guru_nama}</td><td>${r.nama_kbm}</td><td>${r.grade}</td><td>${r.kelompok || ''}</td><td>${r.nama_generus}</td><td>${r.keterangan}</td></tr>`
     ).join('');
     const win = window.open('', '_blank');
     win.document.write(`<html><head><title>Report Generus</title>
@@ -40,7 +43,8 @@ export default function Report() {
       <h2>Report Kegiatan Belajar Generus</h2>
       <p class="meta">Periode: ${from} s/d ${to}</p>
       ${grade ? `<p class="meta">Grade: ${grade}</p>` : ''}
-      <table><thead><tr><th>Tanggal</th><th>Jam</th><th>Guru</th><th>KBM</th><th>Grade</th><th>Nama</th><th>Keterangan</th></tr></thead><tbody>${rows || '<tr><td colspan="7" style="text-align:center">Tidak ada data</td></tr>'}</tbody></table>
+      ${kelompok ? `<p class="meta">Kelompok: ${kelompok}</p>` : ''}
+      <table><thead><tr><th>Tanggal</th><th>Jam</th><th>Guru</th><th>KBM</th><th>Grade</th><th>Kelompok</th><th>Nama</th><th>Keterangan</th></tr></thead><tbody>${rows || '<tr><td colspan="8" style="text-align:center">Tidak ada data</td></tr>'}</tbody></table>
       <p style="margin-top:16px;font-size:11px;color:#999">Dicetak: ${new Date().toLocaleString('id-ID')}</p></body></html>`);
     win.document.close();
     win.print();
@@ -59,6 +63,10 @@ export default function Report() {
             <option value="">-- Semua Grade --</option>
             {GRADES.filter(Boolean).map(g => <option key={g} value={g}>{g}</option>)}
           </select>
+          <select value={kelompok} onChange={e => setKelompok(e.target.value)}>
+            <option value="">-- Semua Kelompok --</option>
+            {KELOMPOK.filter(Boolean).map(k => <option key={k} value={k}>{k}</option>)}
+          </select>
           <select value={generusId} onChange={e => setGenerusId(e.target.value)} disabled={!grade}>
             <option value="">-- Semua Generus --</option>
             {generusList.map(g => <option key={g.id} value={g.id}>{g.nama}</option>)}
@@ -73,13 +81,13 @@ export default function Report() {
       {loaded && (
         <div className="table-wrap">
           <table>
-            <thead><tr><th>Tanggal</th><th>Jam</th><th>Guru</th><th>KBM</th><th>Grade</th><th>Nama</th><th>Keterangan</th></tr></thead>
+            <thead><tr><th>Tanggal</th><th>Jam</th><th>Guru</th><th>KBM</th><th>Grade</th><th>Kelompok</th><th>Nama</th><th>Keterangan</th></tr></thead>
             <tbody>
-              {data.length === 0 ? <tr><td colSpan="7" className="empty">Tidak ada data</td></tr> :
+              {data.length === 0 ? <tr><td colSpan="8" className="empty">Tidak ada data</td></tr> :
                 data.map((r, i) => (
                   <tr key={i}>
                     <td>{r.tanggal}</td><td>{r.jam_mulai}</td><td>{r.guru_nama}</td><td>{r.nama_kbm}</td>
-                    <td>{r.grade}</td><td>{r.nama_generus}</td><td>{r.keterangan}</td>
+                    <td>{r.grade}</td><td>{r.kelompok}</td><td>{r.nama_generus}</td><td>{r.keterangan}</td>
                   </tr>
                 ))}
             </tbody>
